@@ -28,7 +28,7 @@ class HiFiGenerator(BaseModel):
 
     def forward(self, mel_spec: Tensor, **batch) -> Tensor:
         """
-        :param mel_spec: (B, freqs, T)
-        :return: (B, 1, T' > T)
+        :param mel_spec of shape (B, freqs, T)
+        :return: waveform of shape (B, 1, T' > T)
         """
         return self.seq(mel_spec)
