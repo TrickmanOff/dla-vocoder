@@ -43,6 +43,7 @@ class LJSpeechDataset(BaseDataset):
     def __getitem__(self, item: int) -> Dict[str, Any]:
         """
         :return: {
+            'id': str,
             'wave': (1, T),
             'mel': (1, freqs, T'),
         }
@@ -55,6 +56,7 @@ class LJSpeechDataset(BaseDataset):
             wave = wave[:, st_time:st_time+self._max_wave_time_samples]
         mel_spec = self._mel_spec_fn(wave)  # (1, freqs, T)
         return {
+            'id': Path(wav_filepath).stem,
             'wave': wave,
             'mel': mel_spec,
         }
