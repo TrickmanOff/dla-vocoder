@@ -6,8 +6,19 @@ from pathlib import Path
 
 import pandas as pd
 import torch
+import torch.nn.functional as F
+from torch import Tensor
 
 ROOT_PATH = Path(__file__).absolute().resolve().parent.parent.parent
+
+
+def align_last_dim(x: Tensor, target: Tensor, padding_value: float = 0.):
+    target_T = target.shape[-1]
+    T = x.shape[-1]
+    if target_T < T:
+        return x[..., :target_T]
+    else:
+        return F.pad(x, (0, target_T - T), value=padding_value)
 
 
 def ensure_dir(dirname):
