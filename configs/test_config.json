@@ -1,0 +1,32 @@
+{
+  "data": {
+    "train": {
+      "batch_size": 8,
+      "num_workers": 0,
+      "datasets": [
+        {
+          "type": "LJSpeechDataset",
+          "args": {
+            "data_dir": "/Volumes/Samsung_T5/hse4/dla/hw3/data",
+            "limit": 8
+          }
+        }
+      ]
+    }
+  },
+  "generator": {
+    "loss": {
+      "type": "HiFiGANGeneratorLoss",
+      "args": {
+        "adv_loss_weight": 1.0,
+        "mel_loss_weight": 1.0,
+        "fm_loss_weight": 1.0
+      }
+    }
+  },
+  "discriminator": {
+    "loss": {
+      "type": "HiFiGANDiscriminatorLoss"
+    }
+  }
+}

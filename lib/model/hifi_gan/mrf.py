@@ -83,7 +83,8 @@ class MRFStack(nn.Module):
                 nn.LeakyReLU(),
                 nn.ConvTranspose1d(in_channels, out_channels,
                                    kernel_size=transpose_kernel_size,
-                                   stride=transpose_kernel_size // 2),
+                                   stride=transpose_kernel_size // 2,
+                                   padding=transpose_kernel_size // 4),  # t_out = stride * t_in
                 MRF(num_channels=out_channels, **mrf_config),
             ]
 

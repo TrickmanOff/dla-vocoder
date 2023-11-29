@@ -4,13 +4,13 @@ import random
 import re
 import shutil
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import torchaudio
 from speechbrain.utils.data_utils import download_file
-from torch import Tensor
 
 from .base_dataset import BaseDataset
+from lib.mel import MelSpectrogram
 
 
 class LJSpeechDataset(BaseDataset):
@@ -20,18 +20,22 @@ class LJSpeechDataset(BaseDataset):
     VAL_NUM_SAMPLES = 100
 
     def __init__(self, data_dir: Union[str, Path],
-                 mel_spec_fn: Callable[[Tensor], Tensor],
+                 mel_spec_gen: MelSpectrogram,
                  indices_dir: Optional[Union[str, Path]] = None,
                  max_wave_time_samples: Optional[int] = None,
-                 train: bool = True):
+                 train: bool = True,
+                 limit: Optional[int] = None,
+                 **kwargs):
         self._data_dir = Path(data_dir)
         indices_dir = Path(data_dir if indices_dir is None else indices_dir)
         self._indices_dir = indices_dir
 
         self._index = self._get_index(train)
+        if limit is not None:
+            self._index = self._index[:limit]
         self._train = train
         self._max_wave_time_samples = max_wave_time_samples
-        self._mel_spec_fn = mel_spec_fn
+        self._mel_spec_gen = mel_spec_gen
 
     @property
     def sample_rate(self) -> int:
@@ -54,7 +58,13 @@ class LJSpeechDataset(BaseDataset):
         if self._train and self._max_wave_time_samples is not None and wave.shape[1] > self._max_wave_time_samples:
             st_time = random.randint(0, wave.shape[1] - self._max_wave_time_samples)
             wave = wave[:, st_time:st_time+self._max_wave_time_samples]
-        mel_spec = self._mel_spec_fn(wave)  # (1, freqs, T)
+
+        hop_len = self._mel_spec_gen.config.hop_length
+        if wave.shape[-1] % hop_len != 0:
+            new_T = (wave.shape[-1] // hop_len) * hop_len
+            wave = wave[..., :new_T]
+
+        mel_spec = self._mel_spec_gen(wave).squeeze(0)  # (freqs, T)
         return {
             'id': Path(wav_filepath).stem,
             'wave': wave,

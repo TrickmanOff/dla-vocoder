@@ -38,7 +38,7 @@ class MSDSub(nn.Module):
         """
         :param input: waveform of shape (B, 1, T)
         :return: {
-            'output': of shape (B, 1, num_features),
+            'output': of shape (B, num_features),
             'feature_maps': list of tensors
         }
         """
@@ -52,7 +52,7 @@ class MSDSub(nn.Module):
             input = output
 
         return {
-            'output': feature_maps[-1],
+            'output': feature_maps[-1].reshape(input.shape[0], -1),
             'feature_maps': feature_maps,
         }
 
@@ -72,7 +72,7 @@ class MSD(nn.Module):
         """
         :param wave: waveform of shape (B, 1, T)
         :return: {
-            'output': of shape (B, 1, num_features),
+            'outputs': list of tensors,
             'feature_maps': list of tensors
         }
         """
@@ -83,6 +83,6 @@ class MSD(nn.Module):
             outputs.append(result['output'])
             feature_maps += result['feature_maps']
         return {
-            'output': torch.concatenate(outputs, dim=-1),
+            'outputs': outputs,
             'feature_maps': feature_maps,
         }

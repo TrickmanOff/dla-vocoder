@@ -43,7 +43,7 @@ class MPDSub(nn.Module):
         {
           'feature_maps': list of feature maps of subsequent convolutional layers
         so the output is the last value in the list
-          'output': output of shape (B, 1, features_dim)
+          'output': output of shape (B, features_dim)
         }
         """
         T = input.shape[-1]
@@ -58,7 +58,7 @@ class MPDSub(nn.Module):
             # print(input.shape, '->', output.shape)
             input = output
 
-        output = feature_maps[-1].reshape(B, 1, -1)
+        output = feature_maps[-1].reshape(B, -1)
         return {
             'output': output,
             'feature_maps': feature_maps,
@@ -77,7 +77,7 @@ class MPD(nn.Module):
         """
         :param wave: waveform of shape (B, 1, T)
         :return: {
-            'output': of shape (B, 1, num_features),
+            'outputs': list of tensors,
             'feature_maps': list of tensors
         }
         """
@@ -88,6 +88,6 @@ class MPD(nn.Module):
             outputs.append(result['output'])
             feature_maps += result['feature_maps']
         return {
-            'output': torch.concatenate(outputs, dim=-1),
+            'outputs': outputs,
             'feature_maps': feature_maps,
         }

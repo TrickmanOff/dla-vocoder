@@ -23,7 +23,7 @@ class HiFiDiscriminator(BaseModel):
         """
         :param wave: waveform of shape (B, 1, T)
         :return: {
-            'output': of shape (B, 1, num_features),
+            'outputs': list of tensors,
             'feature_maps': list of tensors
         }
         """
@@ -32,8 +32,8 @@ class HiFiDiscriminator(BaseModel):
         for subdiscriminator in [self.msd, self.mpd]:
             result = subdiscriminator(wave)
             feature_maps += result['feature_maps']
-            outputs.append(result['output'])
+            outputs += result['outputs']
         return {
-            'output': torch.concatenate(outputs, dim=-1),
+            'outputs': outputs,
             'feature_maps': feature_maps,
         }
