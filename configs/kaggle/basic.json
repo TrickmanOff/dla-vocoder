@@ -67,7 +67,7 @@
         "type": "StepLR",
         "args": {
           "gamma": 0.999,
-          "step_size": 20
+          "step_size": 27
         }
       },
       "scheduler_mode": "batch"
@@ -98,7 +98,7 @@
         "type": "StepLR",
         "args": {
           "gamma": 0.999,
-          "step_size": 20
+          "step_size": 27
         }
       },
       "scheduler_mode": "batch"
