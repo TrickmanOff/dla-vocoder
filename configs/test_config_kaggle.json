@@ -3,7 +3,7 @@
   "n_gpu": 1,
   "data": {
     "train": {
-      "batch_size": 1,
+      "batch_size": 16,
       "num_workers": 0,
       "datasets": [
         {
@@ -13,7 +13,7 @@
             "indices_dir": "indices",
             "train": true,
             "max_wave_time_samples": 22050,
-            "limit": 1
+            "limit": 16
           }
         }
       ]
