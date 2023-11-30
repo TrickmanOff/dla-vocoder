@@ -7,13 +7,12 @@ from torch import Tensor, nn
 
 class MSDSub(nn.Module):
     def __init__(self, wave_scale: int = 1,
-                 kernel_sizes: Sequence[int] = (15, 41, 41, 41, 41, 5),
-                 strides: Sequence[int] = (1, 4, 4, 4, 4, 1),
-                 hidden_channels: Sequence[int] = (16, 64, 256, 1024, 1024, 1024),
-                 num_groups: Sequence[int] = (1, 4, 16, 64, 256, 1),
+                 kernel_sizes: Sequence[int] = (15, 41, 41, 41, 41, 41, 5),
+                 strides: Sequence[int] = (1, 2, 2, 4, 4, 1, 1),
+                 hidden_channels: Sequence[int] = (128, 128, 256, 512, 1024, 1024, 1024),
+                 num_groups: Sequence[int] = (1, 4, 16, 16, 16, 16, 1),
                  norm_fn: Callable[[nn.Module], nn.Module] = nn.utils.weight_norm,
                  act_cls: nn.Module = nn.LeakyReLU):
-        # subdiscriminator architecture as in the MelGAN, in the HiFiGAN slightly different parameters are used
         super().__init__()
         assert len(kernel_sizes) == len(strides) == len(hidden_channels) == len(num_groups)
 
@@ -24,13 +23,13 @@ class MSDSub(nn.Module):
                 zip(kernel_sizes, strides, hidden_channels, num_groups):
             convs.append(nn.Sequential(
                 norm_fn(nn.Conv1d(in_channels, out_channels, kernel_size=kernel_size, stride=stride,
-                                  groups=groups)),
+                                  groups=groups, padding=kernel_size // 2)),
                 act_cls(),
             ))
             in_channels = out_channels
 
         convs.append(
-            norm_fn(nn.Conv1d(in_channels, 1, kernel_size=3))
+            norm_fn(nn.Conv1d(in_channels, 1, kernel_size=3, padding=1))
         )
         self.convs = convs
 
