@@ -1,6 +1,7 @@
 import argparse
 import collections
 import warnings
+from copy import deepcopy
 
 import numpy as np
 import torch
@@ -41,11 +42,11 @@ def main(config: ConfigParser):
                                     model_kwargs={"mel_freqs_cnt": mel_spec_gen.config.n_mels})
     discriminator = get_trained_network(config, "discriminator")
 
+    device, device_ids = prepare_device(config["n_gpu"])
     for trained_net in [generator, discriminator]:
         logger.info(trained_net.model)
 
         # prepare for (multi-device) GPU training
-        device, device_ids = prepare_device(config["n_gpu"])
         trained_net.model = trained_net.model.to(device)
         if len(device_ids) > 1:
             trained_net.model = torch.nn.DataParallel(trained_net.model, device_ids=device_ids)
@@ -67,7 +68,7 @@ def main(config: ConfigParser):
         config=config,
         device=device,
         dataloaders=dataloaders,
-        mel_spec_gen=mel_spec_gen,
+        mel_spec_gen=deepcopy(mel_spec_gen).to(device),
         postprocessor=postprocessor,
         len_epoch=config["trainer"].get("len_epoch", None),
         n_critic=config["trainer"].get("n_critic", 1),
