@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "asr-models-storage",
+  "private_key_id": "cb36515e38f454de270a0a4b6a6628924fc66609",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDGbGOKl51ESa3p\nhn86S9F1ylN73+Gf0Bs+Gd29UVAmgj46WHQOgmJNZ6VsLnOHwSRf0rATgnu9ZAuq\nSRcUeN18mJLsdcSnzeflcAxLqCYE4Z5w5YEfDAgYush9q5Y+eQji2SWhI5o8J3hY\nqp3Ndu33OM1XVm3UsdjpcFu1GdUcX1igmChJ9gXzzHOuI/uAOH02L2V8ClPFUNnL\nL2+Eldn9Uvrr5bR8SAphpufUaGvsaAnIQEhf11cZZDRuCokLtikngOa/5H9co9Y5\nPlcvUzSf+sNogTD7hAP067L3jx2vP7HJ8nAR/j7vuYSzjR+ASzgGHIkqrbDSszxS\n0Sqoup5pAgMBAAECggEAAylxAKFf3oRfYsGY6hXmiuj5duzfYeDlaOeX8qSxZpux\nYClOrXiDFoFYpSZXAvUfSO5I41azSsD7CptK5Ib0iJVp1J4fzx4R3ERyfbYlPPNX\ncgHGPUy/cvLEWnRPMERU0ZXs6pTFqBW87jTHJPdd3WWoqAP25hUbbsTdQT/dzIDq\nmsM9S1BNQYqQBsmTmnqNVpUZTN7zyiPErmDNM4FfS9aGctGMXZseAMZdq+xLsylb\nC1J5BNl+XoseQsDrRQXiuJUNXvp//rEqPl88ymHzzN3EgpbUJxBee+yUxpa3MvA+\nLE5K1E0a61vNkDZyaMA4SImKIPXkPbbDMr6TG09VLQKBgQDigHRTrIFLC9Ixv3cS\nxAM8TTvsOd19ohy0obEkmOvDr+IsWLAQHdCN+RIqng2yYBKjSjuReW1/9kcjJJ4e\nhhYhR5F8M3CgrEuaNSQoYVRuFuKTeNp8/zMOQCxSQp0FBtf3Kcq/u8jq0pRLkObP\n/MZ5NBYfdiwAPGwUhcvzLry8nwKBgQDgQ83bV9sOSigfHpLUSz7bzPsFEriQQJCF\ntVh7Ya18Y7WzXN9kWgSIcku+Xf3+Zmf64FptXO6RGhZqTSNcZnSKqSmv/sw0ruqY\nIsoQ/dvsAOghd7LHIdtoMVcwNe2nfc6oRQPdyTEGic6g/GgO1P5SnPTYYeRY2De7\n0X0KkFq/9wKBgCN6773ztcUlsuVsEqDz53XYu1xDrDhz3n9FHNSYx8W9lXZQ5jOA\nGB1FON1IKOkaN5EwnagqF0cGMxqEL+ikJG9OILIN9MSWeLlNPb69kFY2a4OiWMdf\nyoWe89Jm8OXKrqXe/A2QwuZV2jkEF8PY2tY9nIGNJ1NaI6wLUWlkltgNAoGAFNU3\nolCfAMzSvVFRwnba+AAqsWXzzzKwOjuGZK/GNe/tSSQvfFsAYMx9TMnedmt87Uk6\nHT6syr3ppyZTSpoZ6Wedf8PjpGE7WbahnsJ2U44iAjnkWatDfoJW3xujYBPHxsni\neg/ehgT3NO09nWMb3QDHnfI6DCbJxqDHRNv0EjECgYAKZ04qMQnG83fZctpfFueq\ngfU6T4jzJrGzoIjYODug1StKwXWCbd09eyBGXBgXYj2PThvw2xMcB4SOLc/AW2Vr\nWaR5sQD87lInN+ceWaR+n0qdQfet9pIRx+u+0cWSeoRj+GwoJfWehLV3IeBWnEq1\nP59154OnnavI3xHD/c48sg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "models-importer@asr-models-storage.iam.gserviceaccount.com",
+  "client_id": "110416832328309051036",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/models-importer%40asr-models-storage.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
