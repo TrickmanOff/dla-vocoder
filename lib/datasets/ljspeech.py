@@ -20,7 +20,7 @@ class LJSpeechDataset(BaseDataset):
     VAL_NUM_SAMPLES = 100
 
     def __init__(self, data_dir: Union[str, Path],
-                 mel_spec_gen: MelSpectrogram,
+                 mel_spec_gen: Optional[MelSpectrogram] = None,
                  indices_dir: Optional[Union[str, Path]] = None,
                  max_wave_time_samples: Optional[int] = None,
                  train: bool = True,
@@ -49,7 +49,7 @@ class LJSpeechDataset(BaseDataset):
         :return: {
             'id': str,
             'wave': (1, T),
-            'mel': (1, freqs, T'),
+            'mel': (1, freqs, T'), if mel_spec_gen was specified
         }
         """
         wav_filepath = self._index[item]
@@ -59,17 +59,21 @@ class LJSpeechDataset(BaseDataset):
             st_time = random.randint(0, wave.shape[1] - self._max_wave_time_samples)
             wave = wave[:, st_time:st_time+self._max_wave_time_samples]
 
-        hop_len = self._mel_spec_gen.config.hop_length
-        if wave.shape[-1] % hop_len != 0:
-            new_T = (wave.shape[-1] // hop_len) * hop_len
-            wave = wave[..., :new_T]
-
-        mel_spec = self._mel_spec_gen(wave).squeeze(0)  # (freqs, T)
-        return {
+        res = {
             'id': Path(wav_filepath).stem,
             'wave': wave,
-            'mel': mel_spec,
         }
+
+        if self._mel_spec_gen is not None:
+            hop_len = self._mel_spec_gen.config.hop_length
+            if wave.shape[-1] % hop_len != 0:
+                new_T = (wave.shape[-1] // hop_len) * hop_len
+                wave = wave[..., :new_T]
+
+            mel_spec = self._mel_spec_gen(wave).squeeze(0)  # (freqs, T)
+            res['mel'] = mel_spec
+
+        return res
 
     def _get_index(self, train: bool) -> List[str]:
         index_filepath = self._indices_dir / 'ljspeech_index.json'

@@ -12,7 +12,7 @@
             "data_dir": "/kaggle/input/the-lj-speech-dataset",
             "indices_dir": "indices",
             "train": true,
-            "max_wave_time_samples": 22050,
+            "max_wave_time_samples": 22272,
             "limit": 16
           }
         }

@@ -1,18 +1,19 @@
 from operator import xor
+from typing import Optional
 
 import torch
 from torch.utils.data import ConcatDataset, DataLoader
 
 import lib.datasets
 # from lib import batch_sampler as batch_sampler_module
-from lib.collate_fn.collate import collate_fn
+from lib.collate_fn.collate import Collator
 from lib.config_processing.parse_config import ConfigParser
 from lib.mel import MelSpectrogram
 from lib.trainer.trainer import OptimizationStepper, TrainedNeuralNetwork
 # from lib.text_encoder.base_encoder import BaseTextEncoder
 
 
-def get_dataloaders(configs: ConfigParser, mel_spec_gen: MelSpectrogram):
+def get_dataloaders(configs: ConfigParser, mel_spec_gen: Optional[MelSpectrogram] = None):
     dataloaders = {}
     for split, params in configs["data"].items():
         if not isinstance(params, dict):
@@ -27,7 +28,7 @@ def get_dataloaders(configs: ConfigParser, mel_spec_gen: MelSpectrogram):
         # create and join datasets
         datasets = []
         for ds in params["datasets"]:
-            datasets.append(configs.init_obj(ds, lib.datasets, config_parser=configs, mel_spec_gen=mel_spec_gen))
+            datasets.append(configs.init_obj(ds, lib.datasets, config_parser=configs))
         assert len(datasets)
         if len(datasets) > 1:
             dataset = ConcatDataset(datasets)
@@ -52,9 +53,11 @@ def get_dataloaders(configs: ConfigParser, mel_spec_gen: MelSpectrogram):
         assert bs <= len(dataset), \
             f"Batch size ({bs}) shouldn't be larger than dataset length ({len(dataset)})"
 
+        collator = Collator(mel_spec_gen=mel_spec_gen)
+
         # create dataloader
         dataloader = DataLoader(
-            dataset, batch_size=bs, collate_fn=collate_fn,
+            dataset, batch_size=bs, collate_fn=collator,
             shuffle=shuffle, num_workers=num_workers,
             batch_sampler=batch_sampler, drop_last=drop_last
         )

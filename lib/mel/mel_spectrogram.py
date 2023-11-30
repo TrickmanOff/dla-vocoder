@@ -64,3 +64,6 @@ class MelSpectrogram(nn.Module):
             .log_()
 
         return mel
+
+    def transform_length(self, wave_length: torch.LongTensor) -> torch.LongTensor:
+        return wave_length // self.config.hop_length + 1

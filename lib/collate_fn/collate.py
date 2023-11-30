@@ -1,9 +1,11 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 from torch import Tensor, LongTensor
+
+from lib.mel import MelSpectrogram
 
 
 logger = logging.getLogger(__name__)
@@ -12,7 +14,7 @@ logger = logging.getLogger(__name__)
 PADDING_VALUE = 0
 
 
-def pad_last_d(input: List[Tensor], padding_value=PADDING_VALUE) -> Tuple[Tensor, LongTensor]:
+def pad_last_d(input: List[Tensor], padding_value: float = PADDING_VALUE) -> Tuple[Tensor, LongTensor]:
     """
     each of B inputs is of shape (..., S_i)
 
@@ -34,25 +36,37 @@ def pad_last_d(input: List[Tensor], padding_value=PADDING_VALUE) -> Tuple[Tensor
     return stack, length
 
 
-def collate_fn(dataset_items: List[dict], mel_silence_value: float = 0.) -> Dict[str, Any]:
-    """
-    Collate and pad fields in dataset items
-    """
-    all_items = defaultdict(list)  # {str: [val1, val2, ...], ...}
-    for items in dataset_items:
-        for key, val in items.items():
-            all_items[key].append(val)
+class Collator:
+    def __init__(self, mel_spec_gen: Optional[MelSpectrogram] = None,
+                 mel_silence_value: float = 0.):
+        self.mel_spec_gen = mel_spec_gen
+        if mel_spec_gen is not None:
+            mel_silence_value = mel_spec_gen.config.pad_value
+        self.mel_silence_value = mel_silence_value
 
-    result_batch = {}
+    def __call__(self, dataset_items: List[dict]) -> Dict[str, Any]:
+        """
+            Collate and pad fields in dataset items
+            """
+        all_items = defaultdict(list)  # {str: [val1, val2, ...], ...}
+        for items in dataset_items:
+            for key, val in items.items():
+                all_items[key].append(val)
 
-    result_batch['id'] = all_items['id']
+        result_batch = {}
 
-    # mel
-    if 'mel' in all_items:
-        result_batch['mel_spec'], result_batch['mel_length'] = pad_last_d(all_items['mel'], padding_value=mel_silence_value)
+        result_batch['id'] = all_items['id']
 
-    # wave
-    if 'wave' in all_items:
-        result_batch['target_wave'], result_batch['target_wave_length'] = pad_last_d(all_items['wave'])
+        # wave
+        result_batch['target_wave'], result_batch['target_wave_length'] = pad_last_d(
+            all_items['wave'])
 
-    return result_batch
+        # mel
+        if 'mel' in all_items:
+            result_batch['mel_spec'], result_batch['mel_length'] = pad_last_d(all_items['mel'],
+                                                                              padding_value=self.mel_silence_value)
+        else:
+            result_batch['mel_spec'] = self.mel_spec_gen(result_batch['target_wave']).squeeze(1)
+            result_batch['mel_length'] = self.mel_spec_gen.transform_length(result_batch['target_wave_length'])
+
+        return result_batch
