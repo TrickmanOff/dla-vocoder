@@ -1,9 +1,10 @@
 from abc import abstractmethod
-from typing import Dict
+from typing import Dict, Iterable
 
 import torch
 from numpy import inf
 
+from lib.metric.base_metric import BaseMetric
 from lib.model.base_model import BaseModel
 from lib.logger import get_visualizer
 from lib.storage.experiments_storage import RunStorage
@@ -16,7 +17,7 @@ class BaseTrainer:
     Base class for all trainers
     Responsible for saving and loading checkpoints
     """
-    def __init__(self, models: Dict[str, BaseModel], metrics, optimizers: Dict[str, OptimizationStepper], config, device):
+    def __init__(self, models: Dict[str, BaseModel], metrics: Iterable[BaseMetric], optimizers: Dict[str, OptimizationStepper], config, device):
         self.device = device
         self.config = config
         self.logger = config.get_logger("trainer", config["trainer"]["verbosity"])

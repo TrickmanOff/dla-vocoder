@@ -17,8 +17,31 @@
           }
         }
       ]
+    },
+    "val": {
+      "batch_size": 4,
+      "num_workers": 0,
+      "datasets": [
+        {
+          "type": "LJSpeechDataset",
+          "args": {
+            "data_dir": "/kaggle/input/the-lj-speech-dataset",
+            "indices_dir": "indices",
+            "train": false,
+            "limit": 16
+          }
+        }
+      ]
     }
   },
+  "metrics": [
+    {
+      "type": "MelLossMetric",
+      "args": {
+        "calc_on_train": false
+      }
+    }
+  ],
   "generator": {
     "arch": {
       "type": "HiFiGenerator",
@@ -67,7 +90,7 @@
   "trainer": {
     "n_critic": 1,
     "log_step": 1,
-    "len_epoch": 10,
+    "len_epoch": 5,
     "epochs": 100,
     "save_dir": "saved/",
     "save_period": 100000000000,

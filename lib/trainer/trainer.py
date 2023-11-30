@@ -77,21 +77,18 @@ class Trainer(BaseTrainer):
             "discriminator": MetricTracker(
                 "loss", "grad norm",
                 *discriminator.loss_module.get_loss_parts_names(),
-                *[m.name for m in self.metrics],
+                *[m.name for m in self.metrics if m.calc_on_train],
                 writer=self.writer
             ),
             "generator": MetricTracker(
                 "loss", "grad norm",
                 *generator.loss_module.get_loss_parts_names(),
-                *[m.name for m in self.metrics],
+                *[m.name for m in self.metrics if m.calc_on_train],
                 writer=self.writer
             )
         }
         self.evaluation_metrics = MetricTracker(
-            "loss",
-            *generator.loss_module.get_loss_parts_names(),
-            *discriminator.loss_module.get_loss_parts_names(),
-            *[m.name for m in self.metrics],
+            *[m.name for m in self.metrics if m.calc_on_non_train],
             writer=self.writer
         )
         # self.accumulated_grad_steps = 0
@@ -203,6 +200,8 @@ class Trainer(BaseTrainer):
 
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker,
                       is_discriminator: bool = True):
+        if not is_train:
+            assert not is_discriminator, 'Only generator is used for validation'
         batch = self.move_batch_to_device(batch, self.device)
         trained_model_name = 'discriminator' if is_discriminator else 'generator'
         self.models[trained_model_name].requires_grad_(True)
@@ -213,13 +212,14 @@ class Trainer(BaseTrainer):
         batch['gen_wave'] = gen_wave
         batch['target_wave'] = align_last_dim(batch['target_wave'], gen_wave)
 
-        gen_disc_result = self.models['discriminator'](wave=batch['gen_wave'])
-        true_disc_result = self.models['discriminator'](wave=batch['target_wave'])
+        if is_train:
+            gen_disc_result = self.models['discriminator'](wave=batch['gen_wave'])
+            true_disc_result = self.models['discriminator'](wave=batch['target_wave'])
 
-        batch['gen_disc_outputs'] = gen_disc_result['outputs']
-        batch['gen_disc_fmaps'] = gen_disc_result['feature_maps']
-        batch['true_disc_outputs'] = true_disc_result['outputs']
-        batch['true_disc_fmaps'] = true_disc_result['feature_maps']
+            batch['gen_disc_outputs'] = gen_disc_result['outputs']
+            batch['gen_disc_fmaps'] = gen_disc_result['feature_maps']
+            batch['true_disc_outputs'] = true_disc_result['outputs']
+            batch['true_disc_fmaps'] = true_disc_result['feature_maps']
 
         if not is_discriminator:
             batch['gen_mel_spec'] = self.mel_spec_gen(batch['gen_wave']).squeeze(1)
@@ -228,9 +228,13 @@ class Trainer(BaseTrainer):
 
         loss_module = self.losses[trained_model_name]
         # criterion returns a dict, in which the final loss has a key 'loss'
-        losses = loss_module(**batch)
-        batch.update(losses)
-        losses['loss'].backward()
+
+        if is_train:  # in the current solution I don't need the all values of loss on validation data
+            losses = loss_module(**batch)
+            batch.update(losses)
+            losses['loss'].backward()
+            for loss_part in losses:
+                metrics.update(loss_part, batch[loss_part].item())
 
         if self.postprocessor is not None:
             batch = self.postprocessor(**batch)
@@ -238,22 +242,22 @@ class Trainer(BaseTrainer):
             self._clip_grad_norm()
             self.optimizers[trained_model_name].step()
 
-        for loss_part in losses:
-            metrics.update(loss_part, batch[loss_part].item())
         for met in self.metrics:
-            metrics.update(met.name, met(**batch))
+            if (is_train and met.calc_on_train) or (not is_train and met.calc_on_non_train):
+                metrics.update(met.name, met(**batch))
         return batch
 
     def _evaluation_epoch(self, epoch, part, dataloader):
-        """
-        TODO: fix
+        """=
         Validate after training an epoch
+        Use only generator here!
 
         :param epoch: Integer, current training epoch.
         :return: A log that contains information about validation
         """
-        self.model.eval()
-        self.criterion.eval()
+        for name in self.models:
+            self.models[name].eval()
+            self.losses[name].eval()
         self.evaluation_metrics.reset()
         with torch.no_grad():
             for batch_idx, batch in tqdm(
@@ -265,6 +269,7 @@ class Trainer(BaseTrainer):
                     batch,
                     is_train=False,
                     metrics=self.evaluation_metrics,
+                    is_discriminator=False,
                 )
             self.writer.set_step(epoch * self.len_epoch, part)
             self._log_scalars(self.evaluation_metrics)
