@@ -7,7 +7,7 @@ from torch import Tensor, nn
 class MPDSub(nn.Module):
     def __init__(self, period: int,
                  padding_value: float = 0.,
-                 norm_fn: Callable[[nn.Module], nn.Module] = nn.utils.parametrizations.weight_norm):
+                 norm_fn: Callable[[nn.Module], nn.Module] = nn.utils.weight_norm):
         super().__init__()
 
         convs = nn.ModuleList()

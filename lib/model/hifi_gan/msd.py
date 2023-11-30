@@ -11,7 +11,7 @@ class MSDSub(nn.Module):
                  strides: Sequence[int] = (1, 4, 4, 4, 4, 1),
                  hidden_channels: Sequence[int] = (16, 64, 256, 1024, 1024, 1024),
                  num_groups: Sequence[int] = (1, 4, 16, 64, 256, 1),
-                 norm_fn: Callable[[nn.Module], nn.Module] = nn.utils.parametrizations.weight_norm,
+                 norm_fn: Callable[[nn.Module], nn.Module] = nn.utils.weight_norm,
                  act_cls: nn.Module = nn.LeakyReLU):
         # subdiscriminator architecture as in the MelGAN, in the HiFiGAN slightly different parameters are used
         super().__init__()
@@ -63,7 +63,7 @@ class MSD(nn.Module):
         super().__init__()
         self.subdiscriminators = nn.ModuleList(
             MSDSub(wave_scale=wave_scale,
-                   norm_fn=nn.utils.parametrizations.spectral_norm if wave_scale == 1 else nn.utils.parametrizations.weight_norm,
+                   norm_fn=nn.utils.parametrizations.spectral_norm if wave_scale == 1 else nn.utils.weight_norm,
                    **msd_sub_kwargs)
             for wave_scale in wave_scales
         )
