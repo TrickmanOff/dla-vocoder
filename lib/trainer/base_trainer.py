@@ -184,19 +184,19 @@ class BaseTrainer:
         self.mnt_best = checkpoint["monitor_best"]
 
         # load architecture params from checkpoint.
-        for model_name, state_dict in checkpoint["models"].items():
+        for model_name, model_data in checkpoint["models"].items():
             if checkpoint["config"][model_name]["arch"] != self.config[model_name]["arch"]:
                 self.logger.warning(
                     "Warning: Architecture configuration given in config file is different from that "
                     "of checkpoint. This may yield an exception while state_dict is being loaded."
                 )
-            self.models[model_name].load_state_dict(state_dict)
+            self.models[model_name].load_state_dict(model_data["state_dict"])
 
         # load optimizer state from checkpoint only when optimizer type is not changed.
         for model_name, state_dict in checkpoint["optimizers"].items():
             if (
                     checkpoint["config"][model_name]["optimizer"] != self.config[model_name]["optimizer"] or
-                    checkpoint["config"][model_name].config.get("lr_scheduler", None) != self.config[model_name].get("lr_scheduler", None)
+                    checkpoint["config"][model_name].get("lr_scheduler", None) != self.config[model_name].get("lr_scheduler", None)
             ):
                 self.logger.warning(
                     "Warning: Optimizer or lr_scheduler given in config file is different "
