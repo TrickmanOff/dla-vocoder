@@ -1,5 +1,5 @@
 {
-  "name": "test",
+  "name": "basic",
   "n_gpu": 1,
   "data": {
     "train": {
@@ -62,6 +62,16 @@
         "weight_decay": 0.01
       }
     },
+    "lr_scheduler": {
+      "scheduler": {
+        "type": "StepLR",
+        "args": {
+          "gamma": 0.999,
+          "step_size": 20
+        }
+      },
+      "scheduler_mode": "batch"
+    },
     "loss": {
       "type": "HiFiGANGeneratorLoss",
       "args": {
@@ -83,14 +93,24 @@
         "weight_decay": 0.01
       }
     },
+    "lr_scheduler": {
+      "scheduler": {
+        "type": "StepLR",
+        "args": {
+          "gamma": 0.999,
+          "step_size": 20
+        }
+      },
+      "scheduler_mode": "batch"
+    },
     "loss": {
       "type": "HiFiGANDiscriminatorLoss"
     }
   },
   "trainer": {
     "n_critic": 1,
-    "log_step": 10,
-    "len_epoch": 10,
+    "log_step": 150,
+    "len_epoch": 300,
     "epochs": 10000,
     "monitor": "min val_mel_loss",
     "save_dir": "saved/",
