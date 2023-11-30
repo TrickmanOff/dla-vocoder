@@ -146,7 +146,7 @@ class Trainer(BaseTrainer):
             self.train_metrics[name].reset()
         self.writer.add_scalar("epoch", epoch)
         iter_dataloader = iter(self.train_dataloader)
-        for batch_idx in tqdm(range(self.len_epoch // (self.n_critic + 1)), desc="train"):
+        for batch_idx in tqdm(range(self.len_epoch), desc="train"):
             discriminator_loss = None
             for _ in range(self.n_critic):
                 batch = next(iter_dataloader)

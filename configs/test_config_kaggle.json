@@ -43,8 +43,8 @@
       "type": "HiFiGANGeneratorLoss",
       "args": {
         "adv_loss_weight": 1.0,
-        "mel_loss_weight": 1.0,
-        "fm_loss_weight": 1.0
+        "mel_loss_weight": 2.0,
+        "fm_loss_weight": 4.0
       }
     }
   },

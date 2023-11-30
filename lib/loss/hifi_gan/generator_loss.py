@@ -9,9 +9,9 @@ class HiFiGANGeneratorLoss(CombinedLoss):
                  mel_loss_weight: float = 1.,
                  fm_loss_weight: float = 1.):
         losses = {
-            'gen adv loss': GeneratorAdversarialLoss(),
-            'gen mel loss': GeneratorMelLoss(),
-            'gen fm loss': GeneratorFMLoss(),
+            'adv loss': GeneratorAdversarialLoss(),
+            'mel loss': GeneratorMelLoss(),
+            'fm loss': GeneratorFMLoss(),
         }
         weights = dict(
             zip(losses.keys(), (adv_loss_weight, mel_loss_weight, fm_loss_weight))
