@@ -1,0 +1,80 @@
+{
+  "name": "test",
+  "n_gpu": 1,
+  "data": {
+    "train": {
+      "batch_size": 1,
+      "num_workers": 0,
+      "datasets": [
+        {
+          "type": "LJSpeechDataset",
+          "args": {
+            "data_dir": "/kaggle/input/the-lj-speech-dataset",
+            "indices_dir": "indices",
+            "train": true,
+            "max_wave_time_samples": 22050,
+            "limit": 1
+          }
+        }
+      ]
+    }
+  },
+  "generator": {
+    "arch": {
+      "type": "HiFiGenerator",
+      "args": {
+        "hidden_channels": 512,
+        "transpose_kernel_sizes": [16, 16, 4, 4],
+        "mrf_config": {
+          "kernel_sizes": [3, 7, 11],
+          "dilations": [[[1, 1], [3, 1], [5, 1]], [[1, 1], [3, 1], [5, 1]], [[1, 1], [3, 1], [5, 1]]]
+        }
+      }
+    },
+    "optimizer": {
+      "type": "AdamW",
+      "args": {
+        "lr": 2e-4,
+        "betas": [0.8, 0.99],
+        "weight_decay": 0.01
+      }
+    },
+    "loss": {
+      "type": "HiFiGANGeneratorLoss",
+      "args": {
+        "adv_loss_weight": 1.0,
+        "mel_loss_weight": 1.0,
+        "fm_loss_weight": 1.0
+      }
+    }
+  },
+  "discriminator": {
+    "arch": {
+      "type": "HiFiDiscriminator"
+    },
+    "optimizer": {
+      "type": "AdamW",
+      "args": {
+        "lr": 2e-4,
+        "betas": [0.8, 0.99],
+        "weight_decay": 0.01
+      }
+    },
+    "loss": {
+      "type": "HiFiGANDiscriminatorLoss"
+    }
+  },
+  "trainer": {
+    "n_critic": 1,
+    "log_step": 1,
+    "len_epoch": 10,
+    "epochs": 100,
+    "save_dir": "saved/",
+    "save_period": 100000000000,
+    "verbosity": 2,
+    "visualize": "wandb",
+    "wandb_project": "dla_vocoder",
+    "wandb_run": "kaggle_test",
+    "grad_norm_clip": 100
+  }
+}
