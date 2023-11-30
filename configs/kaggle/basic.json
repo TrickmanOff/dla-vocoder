@@ -12,8 +12,7 @@
             "data_dir": "/kaggle/input/the-lj-speech-dataset",
             "indices_dir": "indices",
             "train": true,
-            "max_wave_time_samples": 22272,
-            "limit": 16
+            "max_wave_time_samples": 22272
           }
         }
       ]
@@ -38,8 +37,7 @@
     {
       "type": "MelLossMetric",
       "args": {
-        "calc_on_train": false,
-        "name": "mel_loss"
+        "calc_on_train": false
       }
     }
   ],
@@ -90,16 +88,15 @@
   },
   "trainer": {
     "n_critic": 1,
-    "log_step": 1,
-    "len_epoch": 5,
+    "log_step": 5,
+    "len_epoch": 10,
     "epochs": 100,
-    "monitor": "min val_mel_loss",
     "save_dir": "saved/",
-    "save_period": 1,
+    "save_period": 100000000000,
     "verbosity": 2,
     "visualize": "wandb",
     "wandb_project": "dla_vocoder",
-    "wandb_run": "kaggle_test",
-    "grad_norm_clip": 100
+    "wandb_run": "kaggle_basic",
+    "grad_norm_clip": 50
   }
 }
