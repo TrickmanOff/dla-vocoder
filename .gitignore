@@ -1,3 +1,4 @@
+.DS_Store
 .idea
 .ipynb_checkpoints
 
@@ -6,3 +7,5 @@
 Untitled.ipynb
 saved
 wandb
+
+audios
